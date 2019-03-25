@@ -1,6 +1,10 @@
 require_relative '../config/environment'
 
 
+prompt = TTY::Prompt.new
+prompt.ask('What dog you want?', default: ENV['USER'])
+
+
 
 puts "                            ..,,,,,,,,,.. 
                      .,;%%%%%%%%%%%%%%%%%%%%;,. 
