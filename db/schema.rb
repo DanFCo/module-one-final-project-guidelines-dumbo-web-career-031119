@@ -10,6 +10,33 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 0) do
+ActiveRecord::Schema.define(version: 3) do
+
+  create_table "adopters", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "age"
+    t.string   "preferences"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "dogs", force: :cascade do |t|
+    t.string   "name"
+    t.string   "adopter"
+    t.string   "shelter"
+    t.integer  "age"
+    t.string   "size"
+    t.string   "breed"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "shelters", force: :cascade do |t|
+    t.string   "name"
+    t.string   "location"
+    t.boolean  "kill_shelter"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end
