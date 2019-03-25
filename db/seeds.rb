@@ -11,3 +11,6 @@ ginger = Dog.create(name: "Ginger", age: 4, size: "Large", breed: "German Shephe
 gizmo = Dog.create(name: "Gizmo", age: 5, size: "Small", breed: "Morkie")
 
 barkr = Shelter.create(name: "Barkr", location: "White Plains", kill_shelter: true)
+dogs_r_us = Shelter.create(name: "Dogs R Us", location: "Brooklyn", kill_shelter false )
+dogs_dogs_dogs = Shelter.create(name:"Dogs Dogs Dogs", location:"Queens", kill_shelter: false)
+roofus = Shelter.create(name:"Roofus and Friends", location:"Queens", kill_shelter: true)
