@@ -1,4 +1,5 @@
 require_relative '../config/environment'
+require 'pry'
 
 puts "                            ..,,,,,,,,,.. 
                      .,;%%%%%%%%%%%%%%%%%%%%;,. 
@@ -42,12 +43,17 @@ def welcome
 
   if welcome_page == 'Login'
     prompt.collect do
-      key(:username).ask('Please enter your username:', required: true)
-      if !Adopter.all.find{|adopter| adopter.username == [:username]}
+      un = key(:username).ask('Please enter your username:', required: true)
+      if !Adopter.find_by username: un
         puts "Username does not exist."
         signup   ###Test this
       end
-      key(:password).mask('Please enter your password:', required: true)
+      pw = key(:password).mask('Please enter your password:', required: true)
+      while !Adopter.find_by password: pw
+        puts "Incorrect password, please try again."
+        pw = key(:password).mask('Please enter your password:', required: true)
+      end
+      search_menu
     end
   else
     signup
@@ -74,11 +80,40 @@ def signup
       key(:password).mask('Please enter your desired password:', required: true)
     end
     )
-
   else
     signup
   end
   welcome
+end
+
+def search_menu
+  prompt = TTY::Prompt.new
+
+  refiner = prompt.select("Hello UNKNOWN, you may choose to refine by location or immediately begin searching for a dog.") do |acc|
+    acc.choice 'Refine By Location', 1
+    acc.choice 'I will go to the ends of the earth to find a dog.', 2
+  end
+
+  if refiner == 1
+    location_pref = refine_by_location
+  else
+
+  end
+end
+
+def refine_by_location
+  prompt = TTY::Prompt.new
+
+  borough_arr = prompt.multi_select("Please select the boroughs that you would like to search from.") do |boroughs|
+    boroughs.choice :Queens
+    boroughs.choice :Brooklyn
+    boroughs.choice :Manhattan
+    boroughs.choice :Bronx
+    boroughs.choice :Staten_Island 
+  end
+
+  ans = borough_arr.collect {|borough| Shelter.find_by location: borough}.flatten
+  puts ans
 end
 
 welcome
