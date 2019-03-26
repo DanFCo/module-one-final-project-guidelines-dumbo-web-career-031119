@@ -24,8 +24,8 @@ ActiveRecord::Schema.define(version: 3) do
 
   create_table "dogs", force: :cascade do |t|
     t.string "name"
-    t.string "adopter"
-    t.string "shelter"
+    t.integer "adopter_id"
+    t.integer "shelter_id"
     t.integer "age"
     t.string "size"
     t.string "breed"

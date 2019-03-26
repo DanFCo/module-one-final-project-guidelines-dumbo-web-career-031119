@@ -96,7 +96,8 @@ def search_menu
 
   if refiner == 1
     location_pref = refine_by_location
-  else
+  else  
+    #add number of dogs tracker while refining
 
   end
 end
@@ -112,8 +113,7 @@ def refine_by_location
     boroughs.choice :Staten_Island 
   end
 
-  ans = borough_arr.collect {|borough| Shelter.find_by location: borough}.flatten
-  puts ans
+  ans = (borough_arr.collect {|borough| Shelter.where location: borough}).flatten
 end
 
 welcome
