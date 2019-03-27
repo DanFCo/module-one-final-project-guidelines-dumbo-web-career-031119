@@ -1,6 +1,11 @@
 system "clear"
 require_relative '../config/environment'
-require 'pry'
+
+def welcome
+  header = Artii::Base.new :font => 'fuzzy'
+  prompt = TTY::Prompt.new
+
+  puts header.asciify('Doogle!')
 
 puts "                            ..,,,,,,,,,.. 
                      .,;%%%%%%%%%%%%%%%%%%%%;,. 
@@ -32,10 +37,9 @@ puts "                            ..,,,,,,,,,..
 %%@@@@@@@@@@@@@@@00000000000000000000000000000@@@@@@@@@%%%%%"
 
 
-
 #LOGIN -> SIGNUP
-def welcome
-  prompt = TTY::Prompt.new
+
+
 
   welcome_page = prompt.select("") do |welcome|
     welcome.choice 'Login'
@@ -98,12 +102,14 @@ def search_menu
   if refiner == 1
     location_pref = refine_by_location
     dog_pref = refine_by_dog_preference
-    final_pref = location_pref.concat(dog_pref)
-
+    binding.pry
+    doggo_array = Dog.where(location_pref).where(dog_pref)
+    binding.pry
   else  
     dog_pref = refine_by_dog_preference
-
+    doggo_array = Dog.where(dog_pref)
   end
+  
 end
 
 def refine_by_location
@@ -128,8 +134,15 @@ def refine_by_dog_preference
     size.choice :Small
     size.choice :Medium
     size.choice :Large
-  end
+    end
   )
-  dog_pref_arr.push()
+
+  dog_pref_arr.push(personality: prompt.select("Please select the personality that you prefer in your doggo.") do |personality|
+    personality.choice :Active
+    personality.choice :Calm
+    end
+  )
+  dog_pref_arr
+end
 
 welcome

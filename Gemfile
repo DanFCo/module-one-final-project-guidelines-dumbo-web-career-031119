@@ -7,4 +7,5 @@ gem "pry"
 gem "require_all"
 gem "tty-prompt"
 gem "lolcat"
+gem "artii"
 
