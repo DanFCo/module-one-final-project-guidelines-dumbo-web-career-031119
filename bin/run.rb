@@ -51,7 +51,7 @@ puts "                            ..,,,,,,,,,..
       un = key(:username).ask('Please enter your username:', required: true)
       if !Adopter.find_by username: un
         puts "Username does not exist."
-        signup   ###Test this
+        signup 
       end
       pw = key(:password).mask('Please enter your password:', required: true)
       while !Adopter.find_by password: pw
@@ -101,15 +101,14 @@ def search_menu
 
   if refiner == 1
     location_pref = refine_by_location
+    binding.pry
     dog_pref = refine_by_dog_preference
-    binding.pry
-    doggo_array = Dog.where(location_pref).where(dog_pref)
-    binding.pry
+    doggo_array = location_pref.collect{|location| location.dogs.where(dog_pref)}
   else  
     dog_pref = refine_by_dog_preference
     doggo_array = Dog.where(dog_pref)
   end
-  
+  doggo_array
 end
 
 def refine_by_location
@@ -123,25 +122,26 @@ def refine_by_location
     boroughs.choice :Staten_Island 
   end
   }
-
+  binding.pry
+  ans = Shelter.select("id").where(borough_arr)   ##could make Location table
 end
 
 def refine_by_dog_preference
   prompt = TTY::Prompt.new
 
-  dog_pref_arr = []
-  dog_pref_arr.push(size: prompt.multi_select("Please select the sizes that you would like to search from.") do |size|
+  dog_pref_arr = {}
+  dog_pref_arr[:size] = prompt.select("Please select the sizes that you would like to search from.") do |size|
     size.choice :Small
     size.choice :Medium
     size.choice :Large
     end
-  )
+  
 
-  dog_pref_arr.push(personality: prompt.select("Please select the personality that you prefer in your doggo.") do |personality|
+  dog_pref_arr[:personality] = prompt.select("Please select the personality that you prefer in your doggo.") do |personality|
     personality.choice :Active
     personality.choice :Calm
     end
-  )
+  
   dog_pref_arr
 end
 
