@@ -1,3 +1,4 @@
+system "clear"
 require_relative '../config/environment'
 require 'pry'
 
@@ -96,8 +97,11 @@ def search_menu
 
   if refiner == 1
     location_pref = refine_by_location
+    dog_pref = refine_by_dog_preference
+    final_pref = location_pref.concat(dog_pref)
+
   else  
-    #add number of dogs tracker while refining
+    dog_pref = refine_by_dog_preference
 
   end
 end
@@ -105,15 +109,27 @@ end
 def refine_by_location
   prompt = TTY::Prompt.new
 
-  borough_arr = prompt.multi_select("Please select the boroughs that you would like to search from.") do |boroughs|
+  borough_arr = {location: prompt.multi_select("Please select the boroughs that you would like to search from.") do |boroughs|
     boroughs.choice :Queens
     boroughs.choice :Brooklyn
     boroughs.choice :Manhattan
     boroughs.choice :Bronx
     boroughs.choice :Staten_Island 
   end
+  }
 
-  ans = (borough_arr.collect {|borough| Shelter.where location: borough}).flatten
 end
+
+def refine_by_dog_preference
+  prompt = TTY::Prompt.new
+
+  dog_pref_arr = []
+  dog_pref_arr.push(size: prompt.multi_select("Please select the sizes that you would like to search from.") do |size|
+    size.choice :Small
+    size.choice :Medium
+    size.choice :Large
+  end
+  )
+  dog_pref_arr.push()
 
 welcome

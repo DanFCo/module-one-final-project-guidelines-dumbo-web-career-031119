@@ -1,4 +1,4 @@
 class Dog < ActiveRecord::Base
-    belongs_to :adopters
-    belongs_to :shelters
+    belongs_to :adopter
+    belongs_to :shelter
 end
