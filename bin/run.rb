@@ -101,14 +101,13 @@ def search_menu
 
   if refiner == 1
     location_pref = refine_by_location
-    binding.pry
     dog_pref = refine_by_dog_preference
     doggo_array = location_pref.collect{|location| location.dogs.where(dog_pref)}
   else  
     dog_pref = refine_by_dog_preference
     doggo_array = Dog.where(dog_pref)
   end
-  doggo_array
+  select_dog(doggo_array.flatten)
 end
 
 def refine_by_location
@@ -122,7 +121,6 @@ def refine_by_location
     boroughs.choice :Staten_Island 
   end
   }
-  binding.pry
   ans = Shelter.select("id").where(borough_arr)   ##could make Location table
 end
 
@@ -143,6 +141,16 @@ def refine_by_dog_preference
     end
   
   dog_pref_arr
+end
+
+def select_dog(dog_arr)
+  prompt = TTY::Prompt.new
+
+  chosen_dog = prompt.select("Here are your choices of dogs you sick bastard.") do |doggo|
+    dog_arr.each do |dog|
+      doggo.choice  "#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed}", -> {dog}
+    end
+  end
 end
 
 welcome
