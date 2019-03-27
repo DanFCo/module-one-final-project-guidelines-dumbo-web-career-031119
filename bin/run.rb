@@ -151,6 +151,7 @@ def select_dog(dog_arr)
       doggo.choice  "#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed}", -> {dog}
     end
   end
+  binding.pry
 end
 
 welcome
