@@ -7,33 +7,33 @@ def welcome
 
   puts header.asciify('Doogle!')
 
-puts "                            ..,,,,,,,,,.. 
-                     .,;%%%%%%%%%%%%%%%%%%%%;,. 
-                   %%%%%%%%%%%%%%%%%%%%////%%%%%%, .,;%%;, 
-            .,;%/,%%%%%/////%%%%%%%%%%%%%%////%%%%,%%//%%%, 
-        .,;%%%%/,%%%///%%%%%%%%%%%%%%%%%%%%%%%%%%%%,////%%%%;, 
-     .,%%%%%%//,%%%%%%%%%%%%%%%%@@%a%%%%%%%%%%%%%%%%,%%/%%%%%%%;, 
-   .,%//%%%%//,%%%%///////%%%%%%%@@@%%%%%%///////%%%%,%%//%%%%%%%%, 
- ,%%%%%///%%//,%%//%%%%%///%%%%%@@@%%%%%////%%%%%%%%%,/%%%%%%%%%%%%% 
-.%%%%%%%%%////,%%%%%%%//%///%%%%@@@@%%%////%%/////%%%,/;%%%%%%%%/%%% 
-%/%%%%%%%/////,%%%%///%%////%%%@@@@@%%%///%%/%%%%%//%,////%%%%//%%%' 
-%//%%%%%//////,%/%a`  'a%///%%%@@@@@@%%////a`  'a%%%%,//%///%/%%%%% 
-%///%%%%%%///,%%%%@@aa@@%//%%%@@@@S@@@%%///@@aa@@%%%%%,/%////%%%%% 
-%%//%%%%%%%//,%%%%%///////%%%@S@@@@SS@@@%%/////%%%%%%%,%////%%%%%' 
-%%//%%%%%%%//,%%%%/////%%@%@SS@@@@@@@S@@@@%%%%/////%%%,////%%%%%' 
-`%/%%%%//%%//,%%%///%%%%@@@S@@@@@@@@@@@@@@@S%%%%////%%,///%%%%%' 
-  %%%%//%%%%/,%%%%%%%%@@@@@@@@@@@@@@@@@@@@@SS@%%%%%%%%,//%%%%%' 
-  `%%%//%%%%/,%%%%@%@@@@@@@@@@@@@@@@@@@@@@@@@S@@%%%%%,/////%%' 
-   `%%%//%%%/,%%%@@@SS@@SSs@@@@@@@@@@@@@sSS@@@@@@%%%,//%%//%' 
-    `%%%%%%/  %%S@@SS@@@@@Ss` .,,.    'sS@@@S@@@@%'  ///%/%' 
-      `%%%/    %SS@@@@SSS@@S.         .S@@SSS@@@@'    //%%' 
-               /`S@@@@@@SSSSSs,     ,sSSSSS@@@@@' 
-             %%//`@@@@@@@@@@@@@Ss,sS@@@@@@@@@@@'/ 
-           %%%%@@00`@@@@@@@@@@@@@'@@@@@@@@@@@'//%% 
-       %%%%%%a%@@@@000aaaaaaaaa00a00aaaaaaa00%@%%%%% 
-    %%%%%%a%%@@@@@@@@@@000000000000000000@@@%@@%%%@%%% 
- %%%%%%a%%@@@%@@@@@@@@@@@00000000000000@@@@@@@@@%@@%%@%% 
-%%%aa%@@@@@@@@@@@@@@0000000000000000000000@@@@@@@@%@@@%%%% 
+puts "                            ..,,,,,,,,,..
+                     .,;%%%%%%%%%%%%%%%%%%%%;,.
+                   %%%%%%%%%%%%%%%%%%%%////%%%%%%, .,;%%;,
+            .,;%/,%%%%%/////%%%%%%%%%%%%%%////%%%%,%%//%%%,
+        .,;%%%%/,%%%///%%%%%%%%%%%%%%%%%%%%%%%%%%%%,////%%%%;,
+     .,%%%%%%//,%%%%%%%%%%%%%%%%@@%a%%%%%%%%%%%%%%%%,%%/%%%%%%%;,
+   .,%//%%%%//,%%%%///////%%%%%%%@@@%%%%%%///////%%%%,%%//%%%%%%%%,
+ ,%%%%%///%%//,%%//%%%%%///%%%%%@@@%%%%%////%%%%%%%%%,/%%%%%%%%%%%%%
+.%%%%%%%%%////,%%%%%%%//%///%%%%@@@@%%%////%%/////%%%,/;%%%%%%%%/%%%
+%/%%%%%%%/////,%%%%///%%////%%%@@@@@%%%///%%/%%%%%//%,////%%%%//%%%'
+%//%%%%%//////,%/%a`  'a%///%%%@@@@@@%%////a`  'a%%%%,//%///%/%%%%%
+%///%%%%%%///,%%%%@@aa@@%//%%%@@@@S@@@%%///@@aa@@%%%%%,/%////%%%%%
+%%//%%%%%%%//,%%%%%///////%%%@S@@@@SS@@@%%/////%%%%%%%,%////%%%%%'
+%%//%%%%%%%//,%%%%/////%%@%@SS@@@@@@@S@@@@%%%%/////%%%,////%%%%%'
+`%/%%%%//%%//,%%%///%%%%@@@S@@@@@@@@@@@@@@@S%%%%////%%,///%%%%%'
+  %%%%//%%%%/,%%%%%%%%@@@@@@@@@@@@@@@@@@@@@SS@%%%%%%%%,//%%%%%'
+  `%%%//%%%%/,%%%%@%@@@@@@@@@@@@@@@@@@@@@@@@@S@@%%%%%,/////%%'
+   `%%%//%%%/,%%%@@@SS@@SSs@@@@@@@@@@@@@sSS@@@@@@%%%,//%%//%'
+    `%%%%%%/  %%S@@SS@@@@@Ss` .,,.    'sS@@@S@@@@%'  ///%/%'
+      `%%%/    %SS@@@@SSS@@S.         .S@@SSS@@@@'    //%%'
+               /`S@@@@@@SSSSSs,     ,sSSSSS@@@@@'
+             %%//`@@@@@@@@@@@@@Ss,sS@@@@@@@@@@@'/
+           %%%%@@00`@@@@@@@@@@@@@'@@@@@@@@@@@'//%%
+       %%%%%%a%@@@@000aaaaaaaaa00a00aaaaaaa00%@%%%%%
+    %%%%%%a%%@@@@@@@@@@000000000000000000@@@%@@%%%@%%%
+ %%%%%%a%%@@@%@@@@@@@@@@@00000000000000@@@@@@@@@%@@%%@%%
+%%%aa%@@@@@@@@@@@@@@0000000000000000000000@@@@@@@@%@@@%%%%
 %%@@@@@@@@@@@@@@@00000000000000000000000000000@@@@@@@@@%%%%%"
 
 
@@ -51,7 +51,7 @@ puts "                            ..,,,,,,,,,..
       un = key(:username).ask('Please enter your username:', required: true)
       if !Adopter.find_by username: un
         puts "Username does not exist."
-        signup 
+        signup
       end
       pw = key(:password).mask('Please enter your password:', required: true)
       while !Adopter.find_by password: pw
@@ -76,7 +76,7 @@ def signup
   end
 
   if account_prompt == 'Yes'
-    Adopter.create(prompt.collect do 
+    Adopter.create(prompt.collect do
       key(:username).ask('Please enter your desired username:', required: true)
       while Adopter.all.include?(:username)    ##Add way for user to exit at any point
         puts "Username is already taken. Please try again."
@@ -103,9 +103,10 @@ def search_menu
     location_pref = refine_by_location
     dog_pref = refine_by_dog_preference
     doggo_array = location_pref.collect{|location| location.dogs.where(dog_pref)}
-  else  
+  else
+     location_pref = Shelter.all
     dog_pref = refine_by_dog_preference
-    doggo_array = Dog.where(dog_pref)
+    doggo_array = location_pref.collect{|location| location.dogs.where(dog_pref)}
   end
   select_dog(doggo_array.flatten)
 end
@@ -118,7 +119,7 @@ def refine_by_location
     boroughs.choice :Brooklyn
     boroughs.choice :Manhattan
     boroughs.choice :Bronx
-    boroughs.choice :Staten_Island 
+    boroughs.choice :Staten_Island
   end
   }
   ans = Shelter.select("id").where(borough_arr)   ##could make Location table
@@ -133,13 +134,13 @@ def refine_by_dog_preference
     size.choice :Medium
     size.choice :Large
     end
-  
+
 
   dog_pref_arr[:personality] = prompt.select("Please select the personality that you prefer in your doggo.") do |personality|
     personality.choice :Active
     personality.choice :Calm
     end
-  
+
   dog_pref_arr
 end
 

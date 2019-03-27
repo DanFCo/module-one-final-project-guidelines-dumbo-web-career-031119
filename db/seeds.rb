@@ -16,4 +16,3 @@ ginger = Dog.create(name: "Ginger", age: 4, size: "Large", personality: "Active"
 gizmo = Dog.create(name: "Gizmo", age: 5, size: "Small", personality: "Active", breed: "Morkie", shelter_id: dogs_dogs_dogs.id)
 lucky = Dog.create(name: "Lucky", age: 5, size: "Small", personality: "Calm", breed: "Morkie", shelter_id: roofus.id)
 peanut = Dog.create(name: "Peanut", age: 4, size: "Large", personality: "Active", breed: "German Shepherd", shelter_id: roofus.id)
-
