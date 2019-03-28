@@ -46,7 +46,7 @@ puts "                            ..,,,,,,,,,..
     welcome.choice 'Login'
     welcome.choice 'Signup'
   end
-  system'clear'
+
   if welcome_page == 'Login'
    prompt.collect do
       un = key(:username).ask('Please enter your username:', required: true)
@@ -62,7 +62,6 @@ puts "                            ..,,,,,,,,,..
 
         signup
       end
-      # pw = key(:password).mask('Please enter your password:', required: true)
       while !Adopter.find_by password: pw, username: un
         puts "Incorrect password, please try again."
         pw = key(:password).mask('Please enter your password:', required: true)
@@ -105,7 +104,6 @@ end
 
 def search_menu
   prompt = TTY::Prompt.new
-
   refiner = prompt.select("Hello #{@@current_user.username}, you may choose to refine by location or immediately begin searching for a dog.", cycle: true, active_color: :blue) do |acc|
     acc.choice 'Refine By Location', 1
     acc.choice 'I will go to the ends of the earth to find a dog.', 2
@@ -116,9 +114,11 @@ def search_menu
     dog_pref = refine_by_dog_preference
     doggo_array = location_pref.collect{|location| location.dogs.where(dog_pref)}
   else
-     location_pref = Shelter.all
+    location_pref = Shelter.all
     dog_pref = refine_by_dog_preference
+    binding.pry
     doggo_array = location_pref.collect{|location| location.dogs.where(dog_pref)}
+    binding.pry
   end
   select_dog(doggo_array.flatten)
 end
@@ -152,7 +152,7 @@ def refine_by_dog_preference
     personality.choice :Active
     personality.choice :Calm
     end
-
+binding.pry
   dog_pref_arr
 end
 
@@ -162,8 +162,7 @@ end
 def assign_user_to_dog(arg)
    doggy = Dog.find_by(id: arg.id)
    doggy.update(adopter_id: @@current_user.id)
-   doggy.update(shelter_id: nil)
- end
+end
 
 
 
@@ -171,7 +170,6 @@ def assign_user_to_dog(arg)
 
 
 def select_dog(dog_arr)
-  colorizer = Lolize::Colorizer.new
   prompt = TTY::Prompt.new
 
   if dog_arr.length == 0 
@@ -183,7 +181,7 @@ def select_dog(dog_arr)
     chosen_dog = prompt.select("Here are your choices of dogs you sick bastard.", cycle: true, active_color: :blue) do |doggo|
       dog_arr.each do |dog|
         if dog.adopter_id != nil
-        doggo.choice  colorizer.write"#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed}", -> {dog}, disabled: '(Unavailable: Dog already reserved)'
+        doggo.choice  "#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed}", -> {dog}, disabled: '(Unavailable: Dog already reserved)'
         else
         doggo.choice  "#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed}", -> {dog}
         end
@@ -197,20 +195,18 @@ end
 
 def congrats(arg)
 
-
-
-
 the_shelter = Shelter.find(arg.shelter_id)
   prompt = TTY::Prompt.new
 
-  puts"Congrats! Your Dog Is Waiting For You at: \n #{the_shelter.name} \n Location: \n #{the_shelter.location} \n Kill Shelter: #{the_shelter.kill_shelter}"
+  puts "\nCongrats! Your Dog Is Waiting For You at: \n #{the_shelter.name} \n Location: #{the_shelter.location} \n Kill Shelter: #{the_shelter.kill_shelter}"
 
   case prompt.yes?("Would you like to continue looking at dogs?")
   when true
     search_menu
   else
-    system'clear'
-    system'^D'
+    Dog.update(shelter_id: nil).where(adopter_id == @@current_user.id)
+    system"clear"
+    system"^D"
   end
 
 end
