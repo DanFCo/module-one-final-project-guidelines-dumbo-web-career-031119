@@ -1,14 +1,14 @@
-system "clear"
+system("clear")
 require_relative '../config/environment'
 
 def welcome
-  header = Artii::Base.new :font => 'fuzzy'
+  header = Artii::Base.new :font => 'big'
   prompt = TTY::Prompt.new
+  colorizer = Lolize::Colorizer.new
 
+  colorizer.write(header.asciify('                Doogle!'))
 
-  puts header.asciify('Doogle!')
-
-puts "                            ..,,,,,,,,,..
+colorizer.write "\n                            ..,,,,,,,,,..
                      .,;%%%%%%%%%%%%%%%%%%%%;,.
                    %%%%%%%%%%%%%%%%%%%%////%%%%%%, .,;%%;,
             .,;%/,%%%%%/////%%%%%%%%%%%%%%////%%%%,%%//%%%,
@@ -42,11 +42,11 @@ puts "                            ..,,,,,,,,,..
 
 
 
-  welcome_page = prompt.select("", cycle: true, active_color: :blue) do |welcome|
+  welcome_page = prompt.select("\n", cycle: true, active_color: :blue) do |welcome|
     welcome.choice 'Login'
     welcome.choice 'Signup'
   end
-
+  system("clear")
   if welcome_page == 'Login'
    prompt.collect do
       un = key(:username).ask('Please enter your username:', required: true)
@@ -62,16 +62,17 @@ puts "                            ..,,,,,,,,,..
 
         signup
       end
-      while !Adopter.find_by password: pw, username: un
+      while !Adopter.where(username: un)
         puts "Incorrect password, please try again."
         pw = key(:password).mask('Please enter your password:', required: true)
 
 
       end
-
+      system("clear")
       search_menu
     end
   else
+    system("clear")
     signup
   end
 
@@ -97,8 +98,10 @@ def signup
     end
     )
   else
+    system("clear")
     signup
   end
+  system("clear")
   welcome
 end
 
@@ -116,9 +119,7 @@ def search_menu
   else
     location_pref = Shelter.all
     dog_pref = refine_by_dog_preference
-    binding.pry
     doggo_array = location_pref.collect{|location| location.dogs.where(dog_pref)}
-    binding.pry
   end
   select_dog(doggo_array.flatten)
 end
@@ -174,16 +175,24 @@ def select_dog(dog_arr)
 
   if dog_arr.length == 0 
     puts "You're too picky! No dog for you! \n"
-    puts "System restart"
-    system 'clear'
-    welcome
+    sleep 1
+    system("clear")
+    puts "System restart in 3..\n"
+    sleep 1
+    system ("clear")
+    puts "System restart in 2..\n"
+    sleep 1
+    system ("clear")
+    puts "System restart in 1..\n"
+    system ("clear")
+    search_menu
   else
     chosen_dog = prompt.select("Here are your choices of dogs you sick bastard.", cycle: true, active_color: :blue) do |doggo|
       dog_arr.each do |dog|
         if dog.adopter_id != nil
-        doggo.choice  "#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed}", -> {dog}, disabled: '(Unavailable: Dog already reserved)'
+        doggo.choice  "#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed} \nSex: #{dog.sex}", -> {dog}, disabled: '(Unavailable: Dog already reserved)'
         else
-        doggo.choice  "#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed}", -> {dog}
+        doggo.choice  "#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed} \nSex: #{dog.sex}", -> {dog}
         end
       end
     end
@@ -201,17 +210,53 @@ the_shelter = Shelter.find(arg.shelter_id)
   puts "\nCongrats! Your Dog Is Waiting For You at: \n #{the_shelter.name} \n Location: #{the_shelter.location} \n Kill Shelter: #{the_shelter.kill_shelter}"
 
   case prompt.yes?("Would you like to continue looking at dogs?")
-  when true
+  when 'Y'
+    system("clear")
     search_menu
-  else
-    Dog.update(shelter_id: nil).where(adopter_id == @@current_user.id)
-    system"clear"
-    system"^D"
+  when 'n'
+    Dog.where(adopter_id: @@current_user.id).update(shelter_id: nil)
+    system("clear")
+    system("^C")
   end
 
 end
 
+# def aux_menu
 
+#   prompt = TTY::Prompt.new
+  
+#   menu_choice = prompt.select("What would you like to do next?") do |acc|
+#     acc.choice 'Look at more dogs', 1
+#     acc.choice 'View My dog Adoptions', 2
+#     acc.choice 'Change Location',3
+#     acc.choice 'Start Over',4
+#     acc.choice 'Exit',5
+  
+#     if menu_choice == 1
+#       refine_by_dog_preference
+#     elsif menu_choice == 2
+  
+#     elsif menu_choice == 3
+#       refine_by_location
+  
+#     elsif  menu_choice == 4
+#       puts "You're too picky! No dog for you! \n"
+#      sleep 1
+#      system("clear")
+#      puts "System restart in 3..\n"
+#      sleep 1
+#      system ("clear")
+#      puts "System restart in 2..\n"
+#      sleep 1
+#      system ("clear")
+#      puts "System restart in 1..\n"
+#      system ("clear")
+#      welcome
+#    elsif menu_choice == 5
+#       system"^D"
+#       end
+#     end
+#   end
 
 
 

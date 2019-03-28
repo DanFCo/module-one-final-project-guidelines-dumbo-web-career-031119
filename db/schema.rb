@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 5) do
     t.integer "shelter_id"
     t.integer "age"
     t.string "size"
+    t.string "sex"
     t.string "breed"
     t.datetime "created_at"
     t.datetime "updated_at"
