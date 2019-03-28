@@ -2,7 +2,6 @@ Adopter.destroy_all
 Dog.destroy_all
 Shelter.destroy_all
 
-m_vick = Adopter.create(name: "Michael Vick", age: 38)
 
 barkr = Shelter.create(name: "Barkr", location: "White Plains", kill_shelter: true)
 dogs_r_us = Shelter.create(name: "Dogs R Us", location: "Brooklyn", kill_shelter: false )

@@ -13,11 +13,8 @@
 ActiveRecord::Schema.define(version: 4) do
 
   create_table "adopters", force: :cascade do |t|
-    t.string "name"
-    t.integer "age"
     t.string "username"
     t.string "password"
-    t.string "preferences"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -47,17 +47,28 @@ puts "                            ..,,,,,,,,,..
   end
 
   if welcome_page == 'Login'
-    prompt.collect do
+   prompt.collect do
       un = key(:username).ask('Please enter your username:', required: true)
+        pw = key(:password).mask('Please enter your password:', required: true)
+
+
+@@current_user = Adopter.where("username = :username and password = :password",{username: un, password: pw})[0]
+
+
+
       if !Adopter.find_by username: un
         puts "Username does not exist."
+
         signup
       end
-      pw = key(:password).mask('Please enter your password:', required: true)
-      while !Adopter.find_by password: pw
+      # pw = key(:password).mask('Please enter your password:', required: true)
+      while !Adopter.find_by password: pw, username: un
         puts "Incorrect password, please try again."
         pw = key(:password).mask('Please enter your password:', required: true)
+
+
       end
+
       search_menu
     end
   else
@@ -76,7 +87,7 @@ def signup
   end
 
   if account_prompt == 'Yes'
-    Adopter.create(prompt.collect do
+    @@current_user = Adopter.create(prompt.collect do
       key(:username).ask('Please enter your desired username:', required: true)
       while Adopter.all.include?(:username)    ##Add way for user to exit at any point
         puts "Username is already taken. Please try again."
@@ -144,15 +155,57 @@ def refine_by_dog_preference
   dog_pref_arr
 end
 
+
+
+
+def assign_user_to_dog(arg)
+
+   doggy = Dog.find_by(id: arg.id)
+   doggy.update(adopter_id: @@current_user.id)
+
+
+
+ end
+
+
+
+
+
+
 def select_dog(dog_arr)
   prompt = TTY::Prompt.new
 
   chosen_dog = prompt.select("Here are your choices of dogs you sick bastard.") do |doggo|
     dog_arr.each do |dog|
       doggo.choice  "#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed}", -> {dog}
+
     end
   end
-  binding.pry
+  assign_user_to_dog(chosen_dog)
+  congrats(chosen_dog)
 end
+
+
+def congrats(arg)
+
+
+
+
+the_shelter = Shelter.find(arg.shelter_id)
+
+  puts"Congrats! Your Dog Is Waiting For You at: \n #{the_shelter.name} \n Location: \n #{the_shelter.location} \n Kill Shelter: #{the_shelter.kill_shelter}"
+
+
+end
+
+
+
+
+
+
+
+
+
+
 
 welcome
