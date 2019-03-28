@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 4) do
+ActiveRecord::Schema.define(version: 5) do
 
   create_table "adopters", force: :cascade do |t|
     t.string "username"
@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(version: 4) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "personality"
+    t.string "wishlist_ids"
   end
 
   create_table "shelters", force: :cascade do |t|

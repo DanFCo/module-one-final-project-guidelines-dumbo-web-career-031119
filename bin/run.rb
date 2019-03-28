@@ -5,6 +5,7 @@ def welcome
   header = Artii::Base.new :font => 'fuzzy'
   prompt = TTY::Prompt.new
 
+
   puts header.asciify('Doogle!')
 
 puts "                            ..,,,,,,,,,..
@@ -41,11 +42,11 @@ puts "                            ..,,,,,,,,,..
 
 
 
-  welcome_page = prompt.select("") do |welcome|
+  welcome_page = prompt.select("", cycle: true, active_color: :blue) do |welcome|
     welcome.choice 'Login'
     welcome.choice 'Signup'
   end
-
+  system'clear'
   if welcome_page == 'Login'
    prompt.collect do
       un = key(:username).ask('Please enter your username:', required: true)
@@ -81,7 +82,7 @@ end
 def signup
   prompt = TTY::Prompt.new
 
-  account_prompt = prompt.select("Would you like to create an account?") do |acc|
+  account_prompt = prompt.select("Would you like to create an account?", cycle: true, active_color: :blue) do |acc|
     acc.choice 'Yes'
     acc.choice 'No'
   end
@@ -105,7 +106,7 @@ end
 def search_menu
   prompt = TTY::Prompt.new
 
-  refiner = prompt.select("Hello UNKNOWN, you may choose to refine by location or immediately begin searching for a dog.") do |acc|
+  refiner = prompt.select("Hello #{@@current_user.username}, you may choose to refine by location or immediately begin searching for a dog.", cycle: true, active_color: :blue) do |acc|
     acc.choice 'Refine By Location', 1
     acc.choice 'I will go to the ends of the earth to find a dog.', 2
   end
@@ -125,7 +126,7 @@ end
 def refine_by_location
   prompt = TTY::Prompt.new
 
-  borough_arr = {location: prompt.multi_select("Please select the boroughs that you would like to search from.") do |boroughs|
+  borough_arr = {location: prompt.multi_select("Please select the boroughs that you would like to search from.", cycle: true, active_color: :blue) do |boroughs|
     boroughs.choice :Queens
     boroughs.choice :Brooklyn
     boroughs.choice :Manhattan
@@ -140,14 +141,14 @@ def refine_by_dog_preference
   prompt = TTY::Prompt.new
 
   dog_pref_arr = {}
-  dog_pref_arr[:size] = prompt.select("Please select the sizes that you would like to search from.") do |size|
+  dog_pref_arr[:size] = prompt.select("Please select the sizes that you would like to search from.", cycle: true, active_color: :blue) do |size|
     size.choice :Small
     size.choice :Medium
     size.choice :Large
     end
 
 
-  dog_pref_arr[:personality] = prompt.select("Please select the personality that you prefer in your doggo.") do |personality|
+  dog_pref_arr[:personality] = prompt.select("Please select the personality that you prefer in your doggo.", cycle: true, active_color: :blue) do |personality|
     personality.choice :Active
     personality.choice :Calm
     end
@@ -159,12 +160,9 @@ end
 
 
 def assign_user_to_dog(arg)
-
    doggy = Dog.find_by(id: arg.id)
    doggy.update(adopter_id: @@current_user.id)
-
-
-
+   doggy.update(shelter_id: nil)
  end
 
 
@@ -173,12 +171,23 @@ def assign_user_to_dog(arg)
 
 
 def select_dog(dog_arr)
+  colorizer = Lolize::Colorizer.new
   prompt = TTY::Prompt.new
 
-  chosen_dog = prompt.select("Here are your choices of dogs you sick bastard.") do |doggo|
-    dog_arr.each do |dog|
-      doggo.choice  "#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed}", -> {dog}
-
+  if dog_arr.length == 0 
+    puts "You're too picky! No dog for you! \n"
+    puts "System restart"
+    system 'clear'
+    welcome
+  else
+    chosen_dog = prompt.select("Here are your choices of dogs you sick bastard.", cycle: true, active_color: :blue) do |doggo|
+      dog_arr.each do |dog|
+        if dog.adopter_id != nil
+        doggo.choice  colorizer.write"#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed}", -> {dog}, disabled: '(Unavailable: Dog already reserved)'
+        else
+        doggo.choice  "#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed}", -> {dog}
+        end
+      end
     end
   end
   assign_user_to_dog(chosen_dog)
@@ -192,9 +201,17 @@ def congrats(arg)
 
 
 the_shelter = Shelter.find(arg.shelter_id)
+  prompt = TTY::Prompt.new
 
   puts"Congrats! Your Dog Is Waiting For You at: \n #{the_shelter.name} \n Location: \n #{the_shelter.location} \n Kill Shelter: #{the_shelter.kill_shelter}"
 
+  case prompt.yes?("Would you like to continue looking at dogs?")
+  when true
+    search_menu
+  else
+    system'clear'
+    system'^D'
+  end
 
 end
 
