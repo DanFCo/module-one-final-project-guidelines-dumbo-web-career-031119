@@ -1,4 +1,5 @@
 system("clear")
+$VERBOSE = nil
 require_relative '../config/environment'
 
 def welcome
@@ -53,16 +54,17 @@ colorizer.write "\n                            ..,,,,,,,,,..
         pw = key(:password).mask('Please enter your password:', required: true)
 
 
-@@current_user = Adopter.where("username = :username and password = :password",{username: un, password: pw})[0]
+      @@current_user = Adopter.where("username = :username and password = :password",{username: un, password: pw})[0]
 
 
 
-      if !Adopter.find_by username: un
+      if !Adopter.find_by(username: un)
         puts "Username does not exist."
 
         signup
       end
-      while !Adopter.where(username: un)
+
+      while Adopter.find_by(username: un)[:password] == pw
         puts "Incorrect password, please try again."
         pw = key(:password).mask('Please enter your password:', required: true)
 
@@ -89,17 +91,17 @@ def signup
 
   if account_prompt == 'Yes'
     @@current_user = Adopter.create(prompt.collect do
-      key(:username).ask('Please enter your desired username:', required: true)
-      while Adopter.all.include?(:username)    ##Add way for user to exit at any point
+      un = key(:username).ask('Please enter your desired username:', required: true)
+      while Adopter.find_by(username: un) != nil
         puts "Username is already taken. Please try again."
-        key(:username).ask('Please enter your desired username:', required: true)
+        un = key(:username).ask('Please enter your desired username:', required: true)
       end
-      key(:password).mask('Please enter your desired password:', required: true)
+      pw = key(:password).mask('Please enter your desired password:', required: true)
     end
     )
   else
     system("clear")
-    signup
+    welcome
   end
   system("clear")
   welcome
@@ -153,22 +155,13 @@ def refine_by_dog_preference
     personality.choice :Active
     personality.choice :Calm
     end
-binding.pry
   dog_pref_arr
 end
-
-
-
 
 def assign_user_to_dog(arg)
    doggy = Dog.find_by(id: arg.id)
    doggy.update(adopter_id: @@current_user.id)
 end
-
-
-
-
-
 
 def select_dog(dog_arr)
   prompt = TTY::Prompt.new
@@ -184,6 +177,7 @@ def select_dog(dog_arr)
     sleep 1
     system ("clear")
     puts "System restart in 1..\n"
+    sleep 1
     system ("clear")
     search_menu
   else
@@ -201,68 +195,27 @@ def select_dog(dog_arr)
   congrats(chosen_dog)
 end
 
-
 def congrats(arg)
 
 the_shelter = Shelter.find(arg.shelter_id)
   prompt = TTY::Prompt.new
 
-  puts "\nCongrats! Your Dog Is Waiting For You at: \n #{the_shelter.name} \n Location: #{the_shelter.location} \n Kill Shelter: #{the_shelter.kill_shelter}"
+  puts "\nCongrats! Your Dog Is Waiting For You At: \n#{the_shelter.name} \nLocation: #{the_shelter.location} \nKill Shelter: #{the_shelter.kill_shelter}"
 
-  case prompt.yes?("Would you like to continue looking at dogs?")
-  when 'Y'
+  cont = prompt.select("Would you like to continue looking at dogs?") do |ans|
+    ans.choice :Yes
+    ans.choice :No
+  end
+  if cont == 'Yes'
     system("clear")
     search_menu
-  when 'n'
+  else
     Dog.where(adopter_id: @@current_user.id).update(shelter_id: nil)
     system("clear")
-    system("^C")
+    system("^D")
   end
 
 end
-
-# def aux_menu
-
-#   prompt = TTY::Prompt.new
-  
-#   menu_choice = prompt.select("What would you like to do next?") do |acc|
-#     acc.choice 'Look at more dogs', 1
-#     acc.choice 'View My dog Adoptions', 2
-#     acc.choice 'Change Location',3
-#     acc.choice 'Start Over',4
-#     acc.choice 'Exit',5
-  
-#     if menu_choice == 1
-#       refine_by_dog_preference
-#     elsif menu_choice == 2
-  
-#     elsif menu_choice == 3
-#       refine_by_location
-  
-#     elsif  menu_choice == 4
-#       puts "You're too picky! No dog for you! \n"
-#      sleep 1
-#      system("clear")
-#      puts "System restart in 3..\n"
-#      sleep 1
-#      system ("clear")
-#      puts "System restart in 2..\n"
-#      sleep 1
-#      system ("clear")
-#      puts "System restart in 1..\n"
-#      system ("clear")
-#      welcome
-#    elsif menu_choice == 5
-#       system"^D"
-#       end
-#     end
-#   end
-
-
-
-
-
-
 
 
 
