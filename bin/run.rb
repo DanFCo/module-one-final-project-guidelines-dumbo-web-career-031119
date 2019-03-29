@@ -49,35 +49,45 @@ colorizer.write "\n                            ..,,,,,,,,,..
   end
   system("clear")
   if welcome_page == 'Login'
-   prompt.collect do
-      un = key(:username).ask('Please enter your username:', required: true)
-      pw = key(:password).mask('Please enter your password:', required: true)
+    login
+  else
+    signup
+  end
+end
 
-        @@current_user = Adopter.find_by("username = :username and password = :password",{username: un, password: pw})
+def login
+  prompt = TTY::Prompt.new
+  system("clear")
+   prompt.collect do
+      un = key(:username).ask("Please enter your username:", required: true)
+
       if !Adopter.find_by(username: un)
         puts "Username does not exist."
-        signup
+        prompt.select("Would you like to try a different username, sign up, or return to the main menu?", cycle: true, active_color: :blue) do |back|
+          back.choice "Retry Username", -> {login}
+          back.choice "Signup", -> {signup}
+          back.choice "Main Menu", -> {welcome}
+        end
       end
 
-      while Adopter.find_by(username: un)[:password] == @@current_user.password
+      pw = key(:password).mask("Please enter your password:", required: true)
+
+      while Adopter.find_by(username: un)[:password] != pw
         puts "Incorrect password, please try again."
-        pw = key(:password).mask('Please enter your password:', required: true)
+        pw = key(:password).mask("Please enter your password:", required: true)
       end
+
+      @@current_user = Adopter.find_by(username: un)
       system("clear")
       search_menu
     end
-  else
-    system("clear")
-    signup
-  end
-
 end
 
 ##Account creation method
 def signup
   prompt = TTY::Prompt.new
 
-  account_prompt = prompt.select("Would you like to create an account?", cycle: true, active_color: :blue) do |acc|
+  account_prompt = prompt.select('Would you like to create an account?', cycle: true, active_color: :blue) do |acc|
     acc.choice 'Yes'
     acc.choice 'No'
   end
@@ -153,24 +163,44 @@ end
 
 def assign_user_to_dog(arg)
    doggy = Dog.find_by(id: arg.id)
-   doggy.update(adopter_id: @@current_user.id)
+   Dog.find_by(id: arg.id).update(adopter_id: @@current_user.id)
 end
 
 def select_dog(dog_arr)
+  system("clear")
+  head = Artii::Base.new :font => 'epic'
   prompt = TTY::Prompt.new
-
   if dog_arr.length == 0 
-    header = Artii::Base.new :font => 'alligator'
-    header.asciify("You're too picky! No dog for you! \n")
-    sleep 1
+    puts head.asciify("No dogs found!")
+    puts "\n"
+    puts head.asciify("Please try again!")
+    sleep 3
     system("clear")
-    header.asciify("System restart in 3..\n")
+    puts head.asciify("System")
+    puts "\n"
+    puts head.asciify("Restart")
+    puts "\n"
+    puts head.asciify("In")
+    puts "\n"
+    puts head.asciify("3")
     sleep 1
     system ("clear")
-    header.asciify("System restart in 2..\n")
+    puts head.asciify("System")
+    puts "\n"
+    puts head.asciify("Restart")
+    puts "\n"
+    puts head.asciify("In")
+    puts "\n"
+    puts head.asciify("2")
     sleep 1
     system ("clear")
-    header.asciify("System restart in 1..\n")
+    puts head.asciify("System")
+    puts "\n"
+    puts head.asciify("Restart")
+    puts "\n"
+    puts head.asciify("In")
+    puts "\n"
+    puts head.asciify("1")
     sleep 1
     system ("clear")
     search_menu
@@ -193,6 +223,8 @@ def congrats(arg)
 
 the_shelter = Shelter.find(arg.shelter_id)
   prompt = TTY::Prompt.new
+  header = Artii::Base.new :font => 'hollywood'
+  colorize = Lolize::Colorizer.new
 
   puts "\nCongrats! Your Dog Is Waiting For You At: \n#{the_shelter.name} \nLocation: #{the_shelter.location} \nKill Shelter: #{the_shelter.kill_shelter}"
 
@@ -206,7 +238,30 @@ the_shelter = Shelter.find(arg.shelter_id)
   else
     Dog.where(adopter_id: @@current_user.id).update(shelter_id: nil)
     system("clear")
-    system("^D")
+    puts "
+                                                    ▄              ▄
+                                                ▌▒█           ▄▀▒▌
+                                                ▌▒▒█        ▄▀▒▒▒▐
+                                              ▐▄▀▒▒▀▀▀▀▄▄▄▀▒▒▒▒▒▐
+                                            ▄▄▀▒░▒▒▒▒▒▒▒▒▒█▒▒▄█▒▐
+                                          ▄▀▒▒▒░░░▒▒▒░░░▒▒▒▀██▀▒▌
+                                          ▐▒▒▒▄▄▒▒▒▒░░░▒▒▒▒▒▒▒▀▄▒▒▌
+                                          ▌░░▌█▀▒▒▒▒▒▄▀█▄▒▒▒▒▒▒▒█▒▐
+                                        ▐░░░▒▒▒▒▒▒▒▒▌██▀▒▒░░░▒▒▒▀▄▌
+                                        ▌░▒▄██▄▒▒▒▒▒▒▒▒▒░░░░░░▒▒▒▒▌
+                                        ▌▒▀▐▄█▄█▌▄░▀▒▒░░░░░░░░░░▒▒▒▐
+                                        ▐▒▒▐▀▐▀▒░▄▄▒▄▒▒▒▒▒▒░▒░▒░▒▒▒▒▌
+                                        ▐▒▒▒▀▀▄▄▒▒▒▄▒▒▒▒▒▒▒▒░▒░▒░▒▒▐
+                                        ▌▒▒▒▒▒▒▀▀▀▒▒▒▒▒▒░▒░▒░▒░▒▒▒▌
+                                        ▐▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒░▒░▒▒▄▒▒▐
+                                          ▀▄▒▒▒▒▒▒▒▒▒▒▒░▒░▒░▒▄▒▒▒▒▌
+                                            ▀▄▒▒▒▒▒▒▒▒▒▒▄▄▄▀▒▒▒▒▄▀
+                                              ▀▄▄▄▄▄▄▀▀▀▒▒▒▒▒▄▄▀
+                                                ▒▒▒▒▒▒▒▒▒▒▀▀"
+    colorize.write(header.asciify("       Goodbye!"))                
+    sleep 3
+    system("clear")
+    system("^C")
   end
 
 end
