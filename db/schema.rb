@@ -30,7 +30,7 @@ ActiveRecord::Schema.define(version: 5) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "personality"
-    t.string "wishlist_ids"
+    t.integer "past_shelter_id"
   end
 
   create_table "shelters", force: :cascade do |t|

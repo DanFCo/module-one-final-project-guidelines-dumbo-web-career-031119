@@ -3,6 +3,7 @@ $VERBOSE = nil
 require_relative '../config/environment'
 
 def welcome
+  system("clear")
   header = Artii::Base.new :font => 'big'
   prompt = TTY::Prompt.new
   colorizer = Lolize::Colorizer.new
@@ -56,8 +57,8 @@ colorizer.write "\n                            ..,,,,,,,,,..
 end
 
 def login
-  prompt = TTY::Prompt.new
   system("clear")
+  prompt = TTY::Prompt.new
    prompt.collect do
       un = key(:username).ask("Please enter your username:", required: true)
 
@@ -111,22 +112,37 @@ def signup
 end
 
 def search_menu
+  system("clear")
   prompt = TTY::Prompt.new
   refiner = prompt.select("Hello #{@@current_user.username}, you may choose to refine by location or immediately begin searching for a dog.", cycle: true, active_color: :blue) do |acc|
-    acc.choice 'Refine By Location', 1
-    acc.choice 'I will go to the ends of the earth to find a dog.', 2
+    acc.choice 'Refine By Location.', 1
+    acc.choice 'I will go to the ends of the earth to find a dog. (include results for all locations)', 2
+    acc.choice 'Check adoption history', 3
   end
 
-  if refiner == 1
+  case refiner
+  when 1
     location_pref = refine_by_location
     dog_pref = refine_by_dog_preference
     doggo_array = location_pref.collect{|location| location.dogs.where(dog_pref)}
-  else
+  when 2
     location_pref = Shelter.all
     dog_pref = refine_by_dog_preference
     doggo_array = location_pref.collect{|location| location.dogs.where(dog_pref)}
+  when 3
+    Dog.where(adopter_id: @@current_user.id).each {|dog|
+      puts dog.name
+      puts dog.sex
+      puts dog.breed
+      puts "Adopted from: #{dog.past_shelter_id}."
+      puts "Adopted on: #{dog.updated_at}."
+    }
+    rtn = prompt.select("What would you like to do?", cycle: true, active_color: :blue) do |menu|
+      menu.choice "Return to search menu.", -> {search_menu}
+      menu.choice "Exit and return to main menu.", -> {welcome}  
+    end
   end
-  select_dog(doggo_array.flatten)
+    select_dog(doggo_array.flatten)
 end
 
 def refine_by_location
@@ -162,8 +178,7 @@ def refine_by_dog_preference
 end
 
 def assign_user_to_dog(arg)
-   doggy = Dog.find_by(id: arg.id)
-   Dog.find_by(id: arg.id).update(adopter_id: @@current_user.id)
+   Dog.find_by(id: arg.id).update(adopter_id: @@current_user.id, past_shelter_id: arg.shelter_id)
 end
 
 def select_dog(dog_arr)
@@ -205,7 +220,7 @@ def select_dog(dog_arr)
     system ("clear")
     search_menu
   else
-    chosen_dog = prompt.select("Here are your choices of dogs you sick bastard.", cycle: true, active_color: :blue) do |doggo|
+    chosen_dog = prompt.select("Here are your choices of dogs:", cycle: true, active_color: :blue) do |doggo|
       dog_arr.each do |dog|
         if dog.adopter_id != nil
         doggo.choice  "#{dog.name} \nAge: #{dog.age} \nBreed: #{dog.breed} \nSex: #{dog.sex}", -> {dog}, disabled: '(Unavailable: Dog already reserved)'
