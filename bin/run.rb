@@ -51,24 +51,17 @@ colorizer.write "\n                            ..,,,,,,,,,..
   if welcome_page == 'Login'
    prompt.collect do
       un = key(:username).ask('Please enter your username:', required: true)
-        pw = key(:password).mask('Please enter your password:', required: true)
+      pw = key(:password).mask('Please enter your password:', required: true)
 
-
-      @@current_user = Adopter.where("username = :username and password = :password",{username: un, password: pw})[0]
-
-
-
+        @@current_user = Adopter.find_by("username = :username and password = :password",{username: un, password: pw})
       if !Adopter.find_by(username: un)
         puts "Username does not exist."
-
         signup
       end
 
-      while Adopter.find_by(username: un)[:password] == pw
+      while Adopter.find_by(username: un)[:password] == @@current_user.password
         puts "Incorrect password, please try again."
         pw = key(:password).mask('Please enter your password:', required: true)
-
-
       end
       system("clear")
       search_menu
@@ -167,16 +160,17 @@ def select_dog(dog_arr)
   prompt = TTY::Prompt.new
 
   if dog_arr.length == 0 
-    puts "You're too picky! No dog for you! \n"
+    header = Artii::Base.new :font => 'alligator'
+    header.asciify("You're too picky! No dog for you! \n")
     sleep 1
     system("clear")
-    puts "System restart in 3..\n"
+    header.asciify("System restart in 3..\n")
     sleep 1
     system ("clear")
-    puts "System restart in 2..\n"
+    header.asciify("System restart in 2..\n")
     sleep 1
     system ("clear")
-    puts "System restart in 1..\n"
+    header.asciify("System restart in 1..\n")
     sleep 1
     system ("clear")
     search_menu
